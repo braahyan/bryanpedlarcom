@@ -16,6 +16,8 @@ service: bryanpedlarcom # NOTE: update this with your service name
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
+plugins:
+  - site-uploader
 
 provider:
   name: aws
@@ -27,6 +29,8 @@ provider:
 
 custom:
   domainName: bryanpedlar.com
+  site_bucket: ${self:custom.domainName}
+  site_dir: site
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
