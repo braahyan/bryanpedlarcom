@@ -153,8 +153,9 @@ resources:
           Name: ${self:custom.domainName}
           Type: A
           AliasTarget:
-            HostedZoneId: Z3AQBSTGFYJSTF
-            DNSName: s3-website-us-east-1.amazonaws.com
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: 
+              "Fn::GetAtt": [ myCDN, DomainName ]
         -
           Name: www.${self:custom.domainName}
           Type: CNAME
