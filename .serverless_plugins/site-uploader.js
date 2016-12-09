@@ -7,6 +7,17 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 
+const walkSync = (dir, filelist = []) => {
+  fs.readdirSync(dir).forEach(file => {
+
+    filelist = fs.statSync(path.join(dir, file)).isDirectory()
+      ? walkSync(path.join(dir, file), filelist)
+      : filelist.concat(path.join(dir, file));
+
+  });
+return filelist;
+}
+
 class Deploy {
   constructor(serverless, options) {
     this.serverless = serverless;
@@ -41,20 +52,19 @@ class Deploy {
       self.serverless.cli.log("define site_dir and site_bucket in custom")
       return;
     }
-    fs.readdir(dirName, (err, files) => {
-      files.forEach(file => {
-        fs.readFile(path.join(dirName, file), function(err, data) {
-          if (err) throw err;
-          const params = {Bucket: bucketName, Key: file, Body: data, ContentType:mime.lookup(file)  };
-          s3.putObject(params, function(err, data) {
-              if (err){
-                  self.serverless.cli.log(err)
-              }     
-              else{
-                  self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, dirName, file));   
-              }
-           });
-        });
+    const files = walkSync(dirName);
+    files.forEach(file => {
+      fs.readFile(file, function(err, data) {
+        if (err) throw err;
+        const params = {Bucket: bucketName, Key: file, Body: data, ContentType:mime.lookup(file)  };
+        s3.putObject(params, function(err, data) {
+            if (err){
+                self.serverless.cli.log(err)
+            }     
+            else{
+                self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, dirName, file));   
+            }
+         });
       });
     })
   };
