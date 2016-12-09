@@ -43,15 +43,15 @@ class Deploy {
     }
     fs.readdir(dirName, (err, files) => {
       files.forEach(file => {
-        fs.readFile(path.join(dirName, file), 'utf8', function(err, data) {
+        fs.readFile(path.join(dirName, file), function(err, data) {
           if (err) throw err;
-          const params = {Bucket: 'bryanpedlar.com', Key: file, Body: data, ContentType:mime.lookup(file)  };
+          const params = {Bucket: bucketName, Key: file, Body: data, ContentType:mime.lookup(file)  };
           s3.putObject(params, function(err, data) {
               if (err){
                   self.serverless.cli.log(err)
               }     
               else{
-                  self.serverless.cli.log("Successfully uploaded data to myBucket/myKey");   
+                  self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, dirName, file));   
               }
            });
         });
