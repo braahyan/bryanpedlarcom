@@ -56,13 +56,13 @@ class Deploy {
     files.forEach(file => {
       fs.readFile(file, function(err, data) {
         if (err) throw err;
-        const params = {Bucket: bucketName, Key: file, Body: data, ContentType:mime.lookup(file)  };
+        const params = {Bucket: bucketName, Key: file.replace(dirName+path.sep, ''), Body: data, ContentType:mime.lookup(file)  };
         s3.putObject(params, function(err, data) {
             if (err){
                 self.serverless.cli.log(err)
             }     
             else{
-                self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, dirName, file));   
+                self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, file.replace(dirName+path.sep, '')));   
             }
          });
       });
