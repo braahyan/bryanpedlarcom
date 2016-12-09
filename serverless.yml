@@ -161,29 +161,47 @@ resources:
           TTL: 60
           ResourceRecords:
           - ${self:custom.domainName}
-  Mappings:
-    RegionMap:
-      us-east-1:
-        S3hostedzoneID: Z3AQBSTGFYJSTF
-        websiteendpoint: s3-website-us-east-1.amazonaws.com
-      us-west-1:
-        S3hostedzoneID: Z2F56UZL2M1ACD
-        websiteendpoint: s3-website-us-west-1.amazonaws.com
-      us-west-2:
-        S3hostedzoneID: Z3BJ6K6RIION7M
-        websiteendpoint: s3-website-us-west-2.amazonaws.com
-      eu-west-1:
-        S3hostedzoneID: Z1BKCTXD74EZPE
-        websiteendpoint: s3-website-eu-west-1.amazonaws.com
-      ap-southeast-1:
-        S3hostedzoneID: Z3O0J2DXBE1FTB
-        websiteendpoint: s3-website-ap-southeast-1.amazonaws.com
-      ap-southeast-2:
-        S3hostedzoneID: Z1WCIGYICN2BYD
-        websiteendpoint: s3-website-ap-southeast-2.amazonaws.com
-      ap-northeast-1:
-        S3hostedzoneID: Z2M4EHUR26P7ZW
-        websiteendpoint: s3-website-ap-northeast-1.amazonaws.com
-      sa-east-1:
-        S3hostedzoneID: Z31GFT0UA1I2HV
-        websiteendpoint: s3-website-sa-east-1.amazonaws.com
+    mycert:
+      DependsOn: bryanpedlarcombucket
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        DomainName: ${self:custom.domainName}
+        SubjectAlternativeNames:
+          - www.${self:custom.domainName}
+    myCDN:
+      DependsOn: mycert
+      Type: "AWS::CloudFront::Distribution"
+      Properties:
+        DistributionConfig:
+          Origins:
+          - DomainName: ${self:custom.domainName}.s3.amazonaws.com
+            Id: myS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+          Enabled: 'true'
+          Comment: Some comment
+          DefaultRootObject: index.html
+          Aliases:
+          - ${self:custom.domainName}
+          - www.${self:custom.domainName}
+          DefaultCacheBehavior:
+            AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+            TargetOriginId: myS3Origin
+            ForwardedValues:
+              QueryString: 'false'
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: allow-all
+            # redirect-to-https
+          PriceClass: PriceClass_200
+          ViewerCertificate:
+            AcmCertificateArn: 
+              Ref: mycert
+            SslSupportMethod: sni-only
