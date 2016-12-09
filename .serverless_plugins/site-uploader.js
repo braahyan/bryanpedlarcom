@@ -56,7 +56,7 @@ class Deploy {
     files.forEach(file => {
       fs.readFile(file, function(err, data) {
         if (err) throw err;
-        let myFilePath = file.replace(dirName + path.sep, '');
+        let myFilePath = path.relative(dirName, file);
         const contentType = mime.lookup(file);
         if(myFilePath.includes("index.html") && myFilePath != "index.html"){
           myFilePath = myFilePath.replace(path.sep + "index.html","");
@@ -68,7 +68,7 @@ class Deploy {
             }     
             else{
                 self.serverless.cli.log("Successfully uploaded " + 
-                                          path.join(bucketName, file.replace(dirName+path.sep, '')) + 
+                                          path.join(bucketName, path.relative(dirName, file)) + 
                                           " to " + 
                                           path.join(bucketName,myFilePath));   
             }
