@@ -56,13 +56,21 @@ class Deploy {
     files.forEach(file => {
       fs.readFile(file, function(err, data) {
         if (err) throw err;
-        const params = {Bucket: bucketName, Key: file.replace(dirName+path.sep, ''), Body: data, ContentType:mime.lookup(file)  };
+        let myFilePath = file.replace(dirName + path.sep, '');
+        const contentType = mime.lookup(file);
+        if(myFilePath.includes("index.html") && myFilePath != "index.html"){
+          myFilePath = myFilePath.replace(path.sep + "index.html","");
+        }
+        const params = {Bucket: bucketName, Key: myFilePath, Body: data, ContentType:contentType  };
         s3.putObject(params, function(err, data) {
             if (err){
                 self.serverless.cli.log(err)
             }     
             else{
-                self.serverless.cli.log("Successfully uploaded to " + path.join(bucketName, file.replace(dirName+path.sep, '')));   
+                self.serverless.cli.log("Successfully uploaded " + 
+                                          path.join(bucketName, file.replace(dirName+path.sep, '')) + 
+                                          " to " + 
+                                          path.join(bucketName,myFilePath));   
             }
          });
       });
