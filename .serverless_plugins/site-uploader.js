@@ -45,7 +45,7 @@ class Deploy {
 
   upload() {
     const self = this;
-    const s3 = new AWS.S3(); 
+    const s3 = new AWS.S3();
     const dirName = self.serverless.service.custom.site_dir;
     const bucketName = self.serverless.service.custom.site_bucket;
     if (!dirName || !bucketName){
@@ -68,12 +68,12 @@ class Deploy {
         s3.putObject(params, function(err, data) {
             if (err){
                 self.serverless.cli.log(err)
-            }     
+            }
             else{
-                self.serverless.cli.log("Successfully uploaded " + 
-                                          path.join(bucketName, path.relative(dirName, file)) + 
-                                          " to " + 
-                                          path.join(bucketName,myFilePath));   
+                self.serverless.cli.log("Successfully uploaded " +
+                                          path.join(bucketName, path.relative(dirName, file)) +
+                                          " to " +
+                                          path.join(bucketName,myFilePath));
             }
          });
       });
