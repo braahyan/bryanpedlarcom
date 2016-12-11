@@ -52,6 +52,9 @@ class Deploy {
       self.serverless.cli.log("define site_dir and site_bucket in custom")
       return;
     }
+
+    // todo: add in checksum checking capability
+
     const files = walkSync(dirName);
     files.forEach(file => {
       fs.readFile(file, function(err, data) {
