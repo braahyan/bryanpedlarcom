@@ -1,7 +1,7 @@
 service: bryanpedlarcom # NOTE: update this with your service name
 
 plugins:
-  - site-uploader
+  - serverless-s3website
 
 provider:
   name: aws
