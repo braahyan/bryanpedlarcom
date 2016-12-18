@@ -106,7 +106,9 @@ resources:
                     -
                       Ref: "bryanpedlarcombucket"
                     - "/*"
-              Principal: "*"
+              Principal:
+                "AWS":
+                  "Fn::GetAtt": [ IamRoleLambdaExecution, "Arn" ]
     wwwbryanpedlarcombucketPolicy: 
       DependsOn: wwwbryanpedlarcombucket
       Type: "AWS::S3::BucketPolicy"
