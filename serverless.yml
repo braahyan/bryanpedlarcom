@@ -1,4 +1,4 @@
-service: bryanpedlarcom # NOTE: update this with your service name
+service: bryanpedlarcom
 
 plugins:
   - serverless-s3website
@@ -6,6 +6,15 @@ plugins:
 provider:
   name: aws
   runtime: python2.7
+  iamRoleStatements:
+    -  Effect: "Allow"
+       Action:
+         - "s3:PutObject"
+       Resource:
+         Fn::Join:
+           - ""
+           - - "arn:aws:s3:::"
+             - Ref : bryanpedlarcombucket
 
 custom:
   domainName: bryanpedlar.com
@@ -17,9 +26,13 @@ package:
     - site/**
     - node_modules/**
 
-#functions:
-#  hello:
-#    handler: handler.hello
+functions:
+  uploadDrawings:
+    handler: handler.upload_drawings
+    events:
+      - http:
+          path: drawings/upload
+          method: post
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -78,6 +91,19 @@ resources:
                   - 
                     - "arn:aws:s3:::"
                     - 
+                      Ref: "bryanpedlarcombucket"
+                    - "/*"
+              Principal: "*"
+            -
+              Action:
+                - "s3:PutObject"
+              Effect: "Allow"
+              Resource:
+                Fn::Join:
+                  - ""
+                  -
+                    - "arn:aws:s3:::"
+                    -
                       Ref: "bryanpedlarcombucket"
                     - "/*"
               Principal: "*"
